@@ -4,9 +4,9 @@ ESPWiFiSetup::ESPWiFiSetup() {
 }
 
 /*
- * This starts the WiFi in AP mode and initializes the DNS and webserver.
+ * This sets the WiFi in AP mode and initializes the DNS and webserver.
  */
-void ESPWiFiSetup::start() {
+void ESPWiFiSetup::init() {
     WiFi.mode(WIFI_AP);
     DEBUG_EWS(F("WiFi AP mode"));
     WiFi.softAPConfig(_apIP, _apIP, IPAddress(255, 255, 255, 0));
@@ -32,14 +32,20 @@ void ESPWiFiSetup::start() {
     DEBUG_EWS(F("HTTP server started"));
 }
 
+
+void ESPWiFiSetup::start() {
+    start(_apSSID, _apPassword, FPSTR(HTTP_IMAGE));
+}
+
 void ESPWiFiSetup::start(const char *apSSID, const char *apPassword, const __FlashStringHelper *image) {
     _apSSID = apSSID;
     _apPassword = apPassword;
     _image = image;
     int count = 0;
     connect = false;
+
     // Start the WiFi AP, Web server and DNS server.
-    start();
+    init();
 
     while(1) {
         // Handle DNS request.
@@ -84,14 +90,12 @@ void ESPWiFiSetup::start(const char *apSSID, const char *apPassword, const __Fla
         }
         yield();
     }
-
     server.reset();
     dnsServer.reset();
 }
 
 void ESPWiFiSetup::handleRoot() { 
     String first_page = FPSTR(HTTP_HEAD);
-    first_page.replace("{v}", "Configure with WiFi Credentials");
     first_page += FPSTR(HTTP_STYLE);
     first_page += FPSTR(HTTP_FORM_STYLE);
     first_page += FPSTR(HTTP_HEAD_END);
@@ -102,7 +106,7 @@ void ESPWiFiSetup::handleRoot() {
     first_page += FPSTR(HTTP_FORM_END);
     first_page += FPSTR(HTTP_END);
 
-    server->sendHeader("Content-Length", String(first_page.length()));
+    server->sendHeader(FPSTR(CON_LEN), String(first_page.length()));
     server->send(200, FPSTR(TEXT_HTML_SEND), first_page);
 }
 
@@ -120,7 +124,6 @@ int ESPWiFiSetup::connectWiFi() {
  */
 void ESPWiFiSetup::submit() {
     String configured_page = FPSTR(HTTP_HEAD_SAVED_PAGE);
-    configured_page.replace("{v}", "WiFi Configured");
     configured_page += FPSTR(HTTP_STYLE);
     configured_page += FPSTR(HTTP_HEAD_END);
     configured_page += FPSTR(HTTP_IMAGE_HEAD);
