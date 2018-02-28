@@ -37,6 +37,10 @@ void ESPWiFiSetup::start() {
     start(_apSSID, _apPassword, FPSTR(HTTP_IMAGE));
 }
 
+void ESPWiFiSetup::start(const char *apSSID, const char *apPassword) {
+    start(apSSID, apPassword, FPSTR(HTTP_IMAGE));
+}
+
 void ESPWiFiSetup::start(const char *apSSID, const char *apPassword, const __FlashStringHelper *image) {
     _apSSID = apSSID;
     _apPassword = apPassword;

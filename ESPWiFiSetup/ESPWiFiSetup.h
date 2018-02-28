@@ -35,10 +35,14 @@ class ESPWiFiSetup
     public:
         ESPWiFiSetup();
     
-        // This starts the WiFi in AP mode with default SSID and empty password.
+        // This starts the WiFi in AP mode with all default parameters.
         // It also runs the DNS and webserver until configured with WiFi credentials.
         void start();
 
+        // This starts the WiFi in AP mode with default image.
+        void start(const char *apSSID, const char *apPassword);
+
+        // This starts the WiFi in AP mode with no default parameters.
         // Image is a string stored in flash which contains a base 64 encoded image string.
         void start(const char *apSSID, const char *apPassword, const __FlashStringHelper *image);
 
